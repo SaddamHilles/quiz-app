@@ -1,34 +1,58 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
+
+type ActionType = 'INCREMENT' | 'DECREMENT' | 'SET_STEP' | 'RESET';
+
+type Action = {
+  payload?: number;
+  type: ActionType;
+};
+
+type State = { count: number; step: number };
+const initialValue: State = {
+  count: 0,
+  step: 1,
+};
+
+const reduce = (state: State, { type, payload }: Action) => {
+  switch (type) {
+    case 'INCREMENT':
+      return { ...state, count: state.count + state.step };
+    case 'DECREMENT':
+      return { ...state, count: state.count - state.step };
+    case 'SET_STEP':
+      return { ...state, step: payload! };
+    case 'RESET':
+      return initialValue;
+    default:
+      return state;
+  }
+};
 
 function DateCounter() {
-  const [count, setCount] = useState(0);
-  const [step, setStep] = useState(1);
+  const [state, dispatch] = useReducer(reduce, initialValue);
 
   // This mutates the date object.
   const date = new Date('june 21 2027');
-  date.setDate(date.getDate() + count);
+  date.setDate(date.getDate() + state.count);
 
   const dec = function () {
-    // setCount((count) => count - 1);
-    setCount(count => count - step);
+    dispatch({ type: 'DECREMENT' });
   };
 
   const inc = function () {
-    // setCount((count) => count + 1);
-    setCount(count => count + step);
+    dispatch({ type: 'INCREMENT' });
   };
 
   const defineCount = function (e: React.ChangeEvent<HTMLInputElement>) {
-    setCount(Number(e.target.value));
+    console.log('first: ', Number(e.target.value));
   };
 
   const defineStep = function (e: React.ChangeEvent<HTMLInputElement>) {
-    setStep(Number(e.target.value));
+    dispatch({ type: 'SET_STEP', payload: Number(e.target.value) });
   };
 
   const reset = function () {
-    setCount(0);
-    setStep(1);
+    dispatch({ type: 'RESET' });
   };
 
   return (
@@ -38,15 +62,15 @@ function DateCounter() {
           type="range"
           min="0"
           max="10"
-          value={step}
+          value={state.step}
           onChange={defineStep}
         />
-        <span>{step}</span>
+        <span>{state.step}</span>
       </div>
 
       <div>
         <button onClick={dec}>-</button>
-        <input value={count} onChange={defineCount} />
+        <input value={state.count} onChange={defineCount} />
         <button onClick={inc}>+</button>
       </div>
 
