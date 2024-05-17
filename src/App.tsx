@@ -8,6 +8,10 @@ import Loader from './components/Loader';
 import HeroStart from './components/HeroStart';
 import Qustion from './components/Qustion';
 import NextButton from './components/NextButton';
+import Container from './components/Container';
+import Progress from './components/Progress';
+import RestartQuiz from './components/RestartQuiz';
+import FinishScreen from './components/FinishScreen';
 
 export type Nullable<T> = T | null | undefined;
 export type Actions = {
@@ -19,7 +23,9 @@ type ActionTypes =
   | 'DATA_FAILED'
   | 'START'
   | 'NEW_ANSWER'
-  | 'NEXT_QUESTION';
+  | 'NEXT_QUESTION'
+  | 'RESTART'
+  | 'FINISH';
 type STATUS_TYPES = 'loading' | 'error' | 'ready' | 'active' | 'finished';
 
 type State = {
@@ -27,14 +33,14 @@ type State = {
   status: STATUS_TYPES;
   indexQuestion: number;
   answer: Nullable<number>;
-  points: number;
+  studentPoints: number;
 };
 const initialState: State = {
   questions: [],
   status: 'loading',
   indexQuestion: 0,
   answer: null,
-  points: 0,
+  studentPoints: 0,
 };
 
 const reduce = (state: State, action: Actions) => {
@@ -57,25 +63,34 @@ const reduce = (state: State, action: Actions) => {
       return {
         ...state,
         answer: payload?.answer,
-        points:
+        studentPoints:
           ques.correctOption === payload?.answer
-            ? state.points + ques.points
-            : state.points,
+            ? state.studentPoints + ques.points
+            : state.studentPoints,
       };
     }
     case 'NEXT_QUESTION':
       return { ...state, indexQuestion: state.indexQuestion + 1, answer: null };
+    case 'FINISH':
+      return { ...state, status: payload?.status || 'finished' };
+    case 'RESTART':
+      return {
+        ...initialState,
+        questions: state.questions,
+        status: payload?.status || 'ready',
+      };
     default:
       throw new Error('Action unknown');
   }
 };
 function App() {
-  const [{ questions, status, indexQuestion, answer }, dispatch] = useReducer(
-    reduce,
-    initialState
-  );
+  const [
+    { questions, status, indexQuestion, answer, studentPoints },
+    dispatch,
+  ] = useReducer(reduce, initialState);
   const questionsLengh = questions.length;
 
+  const maxPossiblePoints = questions.reduce((acc, cur) => acc + cur.points, 0);
   useEffect(() => {
     (async function () {
       try {
@@ -100,11 +115,10 @@ function App() {
     })();
   }, []);
   return (
-    <div className="app">
+    <Container>
       <Header />
-
       <Main>
-        <div>
+        <>
           {status === 'loading' && <Loader />}
           {status === 'error' && <ErrorComp />}
           {status === 'ready' && (
@@ -112,38 +126,38 @@ function App() {
           )}
           {status === 'active' && (
             <>
+              <Progress
+                indexQuestion={indexQuestion}
+                maxPossiblePoints={maxPossiblePoints}
+                questionsLengh={questionsLengh}
+                studentPoints={studentPoints}
+                answer={answer}
+              />
               <Qustion
                 question={questions[indexQuestion]}
                 dispatch={dispatch}
                 answer={answer}
               />
-              <NextButton dispatch={dispatch} answer={answer} />
+              <NextButton
+                dispatch={dispatch}
+                answer={answer}
+                indexQuestion={indexQuestion}
+                questionsLengh={questionsLengh}
+              />
             </>
           )}
-          {/* {state.questions.map((question, i) => (
-            <ul key={i}>
-              <li>
-                {' '}
-                <p>{question.question}</p>{' '}
-              </li>
-              <ol>
-                {question.options.map((option, i) => (
-                  <li key={i}>
-                    <input
-                      type="radio"
-                      value={option}
-                      name={question.question}
-                      id={option}
-                    />
-                    <label htmlFor={option}>{option}</label>
-                  </li>
-                ))}
-              </ol>
-            </ul>
-          ))} */}
-        </div>
+          {status === 'finished' && (
+            <>
+              <FinishScreen
+                maxPossiblePoints={maxPossiblePoints}
+                studentPoints={studentPoints}
+              />
+              <RestartQuiz dispatch={dispatch} />
+            </>
+          )}
+        </>
       </Main>
-    </div>
+    </Container>
   );
 }
 

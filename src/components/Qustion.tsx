@@ -7,11 +7,13 @@ interface Props {
   dispatch: React.Dispatch<Actions>;
   answer: Nullable<number>;
 }
-const Qustion = ({
-  question: { question, options, correctOption },
-  dispatch,
-  answer,
-}: Props) => {
+const Qustion = (props: Props) => {
+  const {
+    question: { question, options, correctOption },
+    dispatch,
+    answer,
+  } = props;
+  
   return (
     <div>
       <h4>{question}</h4>
