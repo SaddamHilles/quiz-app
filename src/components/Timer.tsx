@@ -1,5 +1,6 @@
 import { useTimer } from 'react-timer-hook';
 import { Actions } from '../App';
+import { useEffect } from 'react';
 
 const timerStyle = {
   fontSize: '2rem',
@@ -12,26 +13,35 @@ const timerStyle = {
 interface Props {
   expiryTimestamp: Date;
   dispatch: React.Dispatch<Actions>;
+  secondsRemaining: number;
 }
-const Timer = ({ expiryTimestamp, dispatch }: Props) => {
-  const { seconds, minutes } = useTimer({
-    expiryTimestamp,
-    onExpire: () => dispatch({ type: 'FINISH' }),
-    autoStart: true,
-  });
+const Timer = ({ expiryTimestamp, dispatch, secondsRemaining }: Props) => {
+  // const { seconds, minutes } = useTimer({
+  //   expiryTimestamp,
+  //   onExpire: () => dispatch({ type: 'FINISH' }),
+  //   autoStart: true,
+  // });
 
   function setPadStart(val: number | string) {
     return String(val).padStart(2, '0');
   }
-  const totalRemainingSeconds = minutes * 60 + seconds
+  // const totalRemainingSeconds = minutes * 60 + seconds;
+
+  useEffect(() => {
+    setInterval(() => dispatch({ type: 'TICK' }), 1000);
+  }, [dispatch]);
+
+  const minutes = Math.floor(secondsRemaining / 60);
+  const seconds = secondsRemaining % 60;
 
   return (
     <div
       style={{
         ...timerStyle,
-        color: totalRemainingSeconds > 20 ? 'black' : 'red',
+        color: secondsRemaining > 20 ? 'black' : 'red',
       }}
     >
+      {/* <span>{setPadStart(minutes)}</span>:<span>{setPadStart(seconds)}</span> */}
       <span>{setPadStart(minutes)}</span>:<span>{setPadStart(seconds)}</span>
     </div>
   );

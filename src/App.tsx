@@ -16,10 +16,12 @@ import Timer from './components/Timer';
 import FlexContainer from './components/FlexContainer';
 
 export type Nullable<T> = T | null | undefined;
+
 export type Actions = {
   type: ActionTypes;
   payload?: Partial<State>;
 };
+
 type ActionTypes =
   | 'DATA_RECEIVED'
   | 'DATA_FAILED'
@@ -27,7 +29,9 @@ type ActionTypes =
   | 'NEW_ANSWER'
   | 'NEXT_QUESTION'
   | 'RESTART'
-  | 'FINISH';
+  | 'FINISH'
+  | 'TICK';
+
 type STATUS_TYPES = 'loading' | 'error' | 'ready' | 'active' | 'finished';
 
 type State = {
@@ -36,6 +40,7 @@ type State = {
   indexQuestion: number;
   answer: Nullable<number>;
   studentPoints: number;
+  secondsRemaining: number;
 };
 const initialState: State = {
   questions: [],
@@ -43,6 +48,7 @@ const initialState: State = {
   indexQuestion: 0,
   answer: null,
   studentPoints: 0,
+  secondsRemaining: 416,
 };
 
 const reduce = (state: State, action: Actions) => {
@@ -81,18 +87,26 @@ const reduce = (state: State, action: Actions) => {
         questions: state.questions,
         status: payload?.status || 'ready',
       };
+      case 'TICK':
+      return {
+        ...state, secondsRemaining: state.secondsRemaining -1,
+        status: state.secondsRemaining ? state.status : 'finished'
+      };
     default:
       throw new Error('Action unknown');
   }
 };
+
 function App() {
+  
   const [
-    { questions, status, indexQuestion, answer, studentPoints },
+    { questions, status, indexQuestion, answer, studentPoints, secondsRemaining },
     dispatch,
   ] = useReducer(reduce, initialState);
-  const questionsLengh = questions.length;
 
+  const questionsLengh = questions.length;
   const maxPossiblePoints = questions.reduce((acc, cur) => acc + cur.points, 0);
+
   useEffect(() => {
     (async function () {
       try {
@@ -145,7 +159,7 @@ function App() {
                 answer={answer}
               />
               <FlexContainer>
-                <Timer expiryTimestamp={time} dispatch={dispatch} />
+                <Timer expiryTimestamp={time} dispatch={dispatch} secondsRemaining={secondsRemaining} />
                 <NextButton
                   dispatch={dispatch}
                   answer={answer}
