@@ -23,11 +23,13 @@ const Timer = ({ expiryTimestamp, dispatch }: Props) => {
   function setPadStart(val: number | string) {
     return String(val).padStart(2, '0');
   }
+  const totalRemainingSeconds = minutes * 60 + seconds
+
   return (
     <div
       style={{
         ...timerStyle,
-        color: expiryTimestamp.getSeconds() > 20 ? 'black' : 'red',
+        color: totalRemainingSeconds > 20 ? 'black' : 'red',
       }}
     >
       <span>{setPadStart(minutes)}</span>:<span>{setPadStart(seconds)}</span>
