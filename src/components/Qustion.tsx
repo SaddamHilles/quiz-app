@@ -1,6 +1,7 @@
 import { Actions, Nullable } from '../App';
 import { Questions } from '../utils/interfaces';
 import Options from './Options';
+import Timer from './Timer';
 
 interface Props {
   question: Questions;
@@ -13,7 +14,7 @@ const Qustion = (props: Props) => {
     dispatch,
     answer,
   } = props;
-  
+
   return (
     <div>
       <h4>{question}</h4>

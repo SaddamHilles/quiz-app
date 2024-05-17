@@ -12,6 +12,8 @@ import Container from './components/Container';
 import Progress from './components/Progress';
 import RestartQuiz from './components/RestartQuiz';
 import FinishScreen from './components/FinishScreen';
+import Timer from './components/Timer';
+import FlexContainer from './components/FlexContainer';
 
 export type Nullable<T> = T | null | undefined;
 export type Actions = {
@@ -114,6 +116,10 @@ function App() {
       }
     })();
   }, []);
+
+  const time = new Date();
+  time.setSeconds(time.getSeconds() + 419);
+
   return (
     <Container>
       <Header />
@@ -138,12 +144,15 @@ function App() {
                 dispatch={dispatch}
                 answer={answer}
               />
-              <NextButton
-                dispatch={dispatch}
-                answer={answer}
-                indexQuestion={indexQuestion}
-                questionsLengh={questionsLengh}
-              />
+              <FlexContainer>
+                <Timer expiryTimestamp={time} dispatch={dispatch} />
+                <NextButton
+                  dispatch={dispatch}
+                  answer={answer}
+                  indexQuestion={indexQuestion}
+                  questionsLengh={questionsLengh}
+                />
+              </FlexContainer>
             </>
           )}
           {status === 'finished' && (
