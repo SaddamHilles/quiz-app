@@ -28,7 +28,11 @@ const Timer = ({ expiryTimestamp, dispatch, secondsRemaining }: Props) => {
   // const totalRemainingSeconds = minutes * 60 + seconds;
 
   useEffect(() => {
-    setInterval(() => dispatch({ type: 'TICK' }), 1000);
+    const interval = setInterval(() => dispatch({ type: 'TICK' }), 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [dispatch]);
 
   const minutes = Math.floor(secondsRemaining / 60);
