@@ -1,6 +1,14 @@
 import { useTimer } from 'react-timer-hook';
 import { Actions } from '../App';
 
+const timerStyle = {
+  fontSize: '2rem',
+  backgroundColor: '#495057',
+  borderRadius: '8px',
+  padding: '0.5rem 2rem',
+  width: '8.5rem',
+};
+
 interface Props {
   expiryTimestamp: Date;
   dispatch: React.Dispatch<Actions>;
@@ -12,17 +20,17 @@ const Timer = ({ expiryTimestamp, dispatch }: Props) => {
     autoStart: true,
   });
 
+  function setPadStart(val: number | string) {
+    return String(val).padStart(2, '0');
+  }
   return (
     <div
       style={{
-        fontSize: '2rem',
-        border: '1px solid gray',
-        borderRadius: '8px',
-        padding: '0.5rem 2rem',
-        width: '8rem'
+        ...timerStyle,
+        color: expiryTimestamp.getSeconds() > 20 ? 'black' : 'red',
       }}
     >
-      <span>{minutes}</span>:<span>{seconds}</span>
+      <span>{setPadStart(minutes)}</span>:<span>{setPadStart(seconds)}</span>
     </div>
   );
 };
