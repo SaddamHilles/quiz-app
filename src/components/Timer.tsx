@@ -1,4 +1,3 @@
-import { useTimer } from 'react-timer-hook';
 import { Actions } from '../App';
 import { useEffect } from 'react';
 
@@ -15,7 +14,7 @@ interface Props {
   dispatch: React.Dispatch<Actions>;
   secondsRemaining: number;
 }
-const Timer = ({ expiryTimestamp, dispatch, secondsRemaining }: Props) => {
+const Timer = ({ dispatch, secondsRemaining }: Props) => {
   // const { seconds, minutes } = useTimer({
   //   expiryTimestamp,
   //   onExpire: () => dispatch({ type: 'FINISH' }),
